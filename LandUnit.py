@@ -1,13 +1,13 @@
 from Climate import Climate
 from Fief import Fief
 from Location import Location
-
+import golly as g
+xmax = 1000
+ymax = 1000
 
 class LandUnit:
     serfMax = 10
-    map = []
-    xmax = 1000
-    ymax = 1000
+    fmap = []
     productionvalue = 50
     upkeepcost = 5
 
@@ -23,8 +23,9 @@ class LandUnit:
     def changeowner(self, newowner):
         self.owner = newowner
 
-    def getlandunit(self, x, y):
-        return map[x][y]
+    def getlandunit(self, x, y, fmap):
+        self.fmap = fmap
+        return fmap[x][y][2]
 
     def getproduction(self):
         return self.productionvalue * self.serfs
@@ -34,15 +35,17 @@ class LandUnit:
 
     def getvonneumann(self):
         c = []
-        if (self.xmax > self.gridloc.xloc + 1 >= 0) and (0 <= self.gridloc.yloc < self.ymax):
+        if (xmax > self.gridloc.xloc + 1 >= 0) and (0 <= self.gridloc.yloc < ymax):
             c.append(self.getlandunit(self.gridloc.xloc + 1, self.gridloc.yloc))
-        if (self.xmax > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc + 1 < self.ymax):
+        if (xmax > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc + 1 < ymax):
             c.append(self.getlandunit(self.gridloc.xloc, self.gridloc.yloc + 1))
-        if (self.xmax > self.gridloc.xloc - 1 >= 0) and (0 <= self.gridloc.yloc < self.ymax):
+        if (xmax > self.gridloc.xloc - 1 >= 0) and (0 <= self.gridloc.yloc < ymax):
             c.append(self.getlandunit(self.gridloc.xloc - 1, self.gridloc.yloc))
-        if (self.xmax > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc - 1 < self.ymax):
+        if (xmax > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc - 1 < ymax):
             c.append(self.getlandunit(self.gridloc.xloc, self.gridloc.yloc - 1))
         return c
 
-    def placeserf(self):
+    def addserf(self):
         self.serfs += 1
+        g.setcell(self.gridloc.xloc, self.gridloc.yloc, 2)
+        g.note("Serf placed by " + self.owner.ruler.name)

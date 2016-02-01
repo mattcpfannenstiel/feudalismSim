@@ -8,6 +8,7 @@ class Fief:
         self.attackoptions = []
 
 
+
     def changewarstatus(self):
         # Changes at War status
         self.atWar = -self.atWar
@@ -26,12 +27,12 @@ class Fief:
         t = False
         while i < len(self.containedLand):
             if self.containedLand[i].gridloc.xloc == x and self.containedLand[i].gridloc.yloc == y:
-                self.containedLand.remove(i)
+                self.containedLand.pop(i)
             i += 1
             if t:
                 break
 
-    def getborders(self):
+    def findborders(self):
         # Looks through landunits and finds the ones that border other fiefdoms it then adds
         i = 0
         while i < len(self.containedLand):
@@ -59,7 +60,7 @@ class Fief:
             if t:
                 break
 
-    def calculateupkeep(self):
+    def getupkeep(self):
         i = 0
         cost = 0
         while i < len(self.containedLand):

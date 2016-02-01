@@ -5,6 +5,12 @@ class Grain:
         self.upkeep = 0
         self.store = fief
 
+    def addwealth(self, w):
+        self.wealth += w
+
+    def subtractwealth(self, s):
+        self.wealth -= s
+
     def getwealth(self):
         return self.wealth
 
