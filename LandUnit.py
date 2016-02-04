@@ -1,7 +1,5 @@
 from Climate import Climate
-from Fief import Fief
 from Location import Location
-import golly as g
 xmax = 1000
 ymax = 1000
 
@@ -47,5 +45,3 @@ class LandUnit:
 
     def addserf(self):
         self.serfs += 1
-        g.setcell(self.gridloc.xloc, self.gridloc.yloc, 2)
-        g.note("Serf placed by " + self.owner.ruler.name)
