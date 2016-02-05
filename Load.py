@@ -1,3 +1,5 @@
+import math
+
 from Gollyhandler import Gollyhandler
 from Fief import Fief
 from Grain import Grain
@@ -14,12 +16,16 @@ class Load():
         # Displayed name of the simulation
         g.setsimname("Feudalism Simulation")
 
+        # Max size of hight and width
+        xmax = 1000
+        ymax = 1000
+
         # User entered parameters for testing
         runs = g.getuserinputint("Enter the number of iterations", "5000")
-        lords = g.getuserinputint("Enter the number of lords that can be square rooted ", "2")
-        landcount = g.getuserinputint("Enter the number of landunits per lord that can be square rooted", "1")
-        height = lords * 10
-        width = lords * 10
+        lords = g.getuserinputint("Enter the number of lords that can be square rooted(Max 100)", "4")
+        landcount = g.getuserinputint("Enter the number of landunits per lord that can be square rooted(Max 100)", "4")
+        height = landcount
+        width = landcount
 
         # switches to a rule that has at least 5 states to use in Golly
         g.setrule("LifeHistory")
@@ -41,36 +47,56 @@ class Load():
 
         # Goes through each land unit to give it an initial state and initializes the board
         # Lords are also created with their given fiefs
-        xmax = 1000
-        ymax = 1000
         fmap = []
-        fiefnum = 0
+        fiefnum = 1
+        startpointx = 0
+        startpointy = 0
         lordslist = []
+        sidelength = int(math.sqrt(landcount))
+
         # Boardstate set up as [fmap, lordslist, xmax, ymax]
         boardstate = []
+
         # Sets up landowner and state tracking map
+        g.toconsole("Start map")
         i = 0
-        while i < xmax:
+        while i < width:
             j = 0
             fmap.append([])
-            while j < ymax:
+            while j < height:
                 fmap[i].append([])
                 j += 1
             i +=1
+        g.toconsole("Map made")
 
         # Sets landunits into fiefs and fiefs into lords ownership
-        y = 0
-        while fiefnum < lords:
-            x = 0
+        x = 0
+        while fiefnum <= lords:
+            if fiefnum == 1:
+                g.toconsole("Starting fief construction")
+            elif fiefnum >= sidelength:
+                if fiefnum % (sidelength + 1) == 0:
+                    startpointx = 0
+                    x = startpointx
+                    startpointy += sidelength
+                else:
+                    startpointx += sidelength
+                    x = startpointx
+            else:
+                startpointx += sidelength
             fief = Fief(fiefnum)
-            while x < landcount:
-                land = LandUnit(x, y, fief)
-                fief.containedLand.append(land)
-                fmap[x][y].append(x)
-                fmap[x][y].append(y)
-                fmap[x][y].append(land)
-                fmap[x][y].append(1)
-                g.statechange(x, y, 1)
+            while x < startpointx + sidelength:
+                y = 0 + startpointy
+                while y < startpointy + sidelength:
+                    g.toconsole("Lord " + str(fiefnum) + " landunit at " + str(x) + ", " + str(y))
+                    land = LandUnit(x, y, fief)
+                    fief.containedLand.append(land)
+                    fmap[x][y].append(x)
+                    fmap[x][y].append(y)
+                    fmap[x][y].append(land)
+                    fmap[x][y].append(1)
+                    g.statechange(x, y, 1)
+                    y += 1
                 x += 1
             grain = Grain(fief)
             fief.stores = grain
@@ -78,11 +104,11 @@ class Load():
             lord.land.ruler = lord
             lordslist.append(lord)
             fiefnum += 1
-            y +=1
             g.update()
         boardstate.append(fmap)
         boardstate.append(lordslist)
         boardstate.append(runs)
-        boardstate.append(xmax)
-        boardstate.append(ymax)
+        boardstate.append(width)
+        boardstate.append(height)
+        g.toconsole("Board Creation done")
         return boardstate

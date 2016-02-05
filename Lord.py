@@ -1,8 +1,9 @@
 import random as r
-
 from Army import Army
 from Logger import Logger
-import golly as g
+from Gollyhandler import Gollyhandler
+
+g = Gollyhandler()
 
 
 class Lord:
@@ -32,9 +33,6 @@ class Lord:
     def getname(self):
         return self.name
 
-    def getlordnum(self):
-        return self.lordnum
-
     def getserfs(self):
         return self.serfCount
 
@@ -43,63 +41,53 @@ class Lord:
 
     def decision(self):
         # 33% Chance to attack, buy, or place a serf
-        r = r.randint(0, 98)
-        if r < 33:
-            self.log.track(" is buying knights", 0, False )
-            if self.land.stores > 100:
-                while self.land.stores > 100:
+        g.topopup("In decision")
+        j = r.randint(0, 98)
+        if j < 33:
+            self.log.track(" is buying knights", 0, False)
+            if self.land.stores.getwealth() > 100:
+                g.topopup("In buy phase for " + str(self.name))
+                while self.land.stores.getwealth() > 100:
                     self.buyknight()
-        if r >= 66:
+            g.topopup(str(self.name) + " now has " + str(self.combatants.getknightcount()) + " and " + str(
+                      self.land.stores.getwealth()))
+        if j >= 66:
+            g.topopup("In combat phase")
             if self.combatants.getknightcount > 0:
-                streak = 1
-                while streak == 1:
-                    y = r.randint(0, len(self.land.attackoptions))
-                    streak = self.attack(self.land.attackoptions[y])
+                target = self.lookforwealthyland()
+                g.statechange(target.gridloc.xloc, target.gridloc.yloc, 5)
+                g.update()
+                g.topopup(str(self.name) + " is attacking " + str(target.owner.ruler.name)
+                          + " over land unit at " + str(target.gridloc.xloc) + ", " + str(target.gridloc.yloc))
+                self.attack(target)
+                g.statechange(target.gridloc.xloc, target.gridloc.yloc, 2)
+                g.update()
         else:
-            if self.turn == 0:
-                t = r.randint(0, len(self.land.containedLand))
-                self.land.containedLand[t].placeserf()
-                self.turn = -self.turn
-
-
-    def simpleattack1on1(self, lord):
-        u = r.randint(0,100)
-        e = r.randint(0,100)
-        self.combatants.setknightcount(e)
-        lord.combatants.setknightcount(u)
-        if self.combatants.getknightcount() > lord.combatants.getknightcount():
-            land = lord.land.containedLand[0]
-            g.note(str(land.gridloc.getx) + " is x and " + str(land.gridloc.gety) + " is y")
-            g.setcell(land.gridloc.xloc, land.gridloc.yloc, 5)
-            g.update()
-            g.note(self.name + " is attacking " + lord.name)
-            self.land.containedLand.append(land)
-            land.changeowner(self)
-            lord.land.removeland(land.gridloc.xloc, land.gridloc.yloc)
-            return 1
-        else:
-            return 0
-
+            g.topopup("Waiting")
 
     def attack(self, landUnit):
         # Sends troops into combat, determines the winner and either takes land or defends it
         lose = 0
         win = 1
-        if self.combatants.getknightcount > landUnit.owner.combatants.getknightcount:
-            landUnit.changeowner(self)
+        if self.combatants.getknightcount() > landUnit.owner.ruler.combatants.getknightcount():
+            landUnit.changeowner(self.land)
             self.land.containedLand.append(landUnit)
-            landUnit.owner.land.containedLand.removeland(landUnit.gridloc.xloc, landUnit.gridloc.yloc)
+            landUnit.owner.removeland(landUnit.gridloc.xloc, landUnit.gridloc.yloc)
+            g.topopup(str(self.name) + " wins the battle")
             return win
-        if self.combatants.getknightcount == landUnit.owner.combatants.getknightcount:
+        if self.combatants.getknightcount() == landUnit.owner.ruler.combatants.getknightcount():
             i = r.randint(0, 99)
             if i > 49:
-                landUnit.changeowner(self)
+                landUnit.changeowner(self.land)
                 self.land.containedLand.append(landUnit)
-                landUnit.owner.land.containedLand.removeland(landUnit.gridloc.xloc, landUnit.gridloc.yloc)
+                landUnit.owner.removeland(landUnit.gridloc.xloc, landUnit.gridloc.yloc)
+                g.topopup(str(self.name) + " wins the battle")
                 return win
             else:
+                g.topopup(str(landUnit.owner.ruler.name) + " wins the battle")
                 return lose
         else:
+            g.topopup(str(landUnit.owner.ruler.name) + " wins the battle")
             return lose
 
     def buyknight(self):
@@ -107,5 +95,18 @@ class Lord:
         if self.land.stores.getwealth() < 0:
             self.log.track("stores are less than zero", self.land.stores.getwealth(), True)
         else:
-            self.land.stores.subtractwealth(self.combatants.getcost)
+            self.land.stores.subtractwealth(self.combatants.getcost())
             self.combatants.addknight()
+
+    def lookforwealthyland(self):
+        i = 0
+        temp = 0
+        target = self.land.attackoptions[0]
+        g.topopup("In wealthy lookup")
+        while i < len(self.land.attackoptions):
+            if temp < self.land.attackoptions[i].getproduction():
+                temp = self.land.attackoptions[i].getproduction()
+                target = self.land.attackoptions[i]
+            i += 1
+        g.topopup("Target is " + str(target.owner.ruler.name) +" at "+ str(target.gridloc.xloc) + ", " + str(target.gridloc.yloc))
+        return target

@@ -5,12 +5,11 @@ ymax = 1000
 
 class LandUnit:
     serfMax = 10
-    fmap = []
     productionvalue = 50
     upkeepcost = 5
 
     def __init__(self, x, y, fief):
-        self.farmable = False
+        self.farmable = True
         self.serfs = 0
         self.weather = Climate()
         self.owner = fief
@@ -22,7 +21,6 @@ class LandUnit:
         self.owner = newowner
 
     def getlandunit(self, x, y, fmap):
-        self.fmap = fmap
         return fmap[x][y][2]
 
     def getproduction(self):
@@ -31,17 +29,20 @@ class LandUnit:
     def getupkeep(self):
         return self.serfs * self.upkeepcost
 
-    def getvonneumann(self):
+    def getvonneumann(self, fmap):
         c = []
-        if (xmax > self.gridloc.xloc + 1 >= 0) and (0 <= self.gridloc.yloc < ymax):
-            c.append(self.getlandunit(self.gridloc.xloc + 1, self.gridloc.yloc))
-        if (xmax > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc + 1 < ymax):
-            c.append(self.getlandunit(self.gridloc.xloc, self.gridloc.yloc + 1))
-        if (xmax > self.gridloc.xloc - 1 >= 0) and (0 <= self.gridloc.yloc < ymax):
-            c.append(self.getlandunit(self.gridloc.xloc - 1, self.gridloc.yloc))
-        if (xmax > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc - 1 < ymax):
-            c.append(self.getlandunit(self.gridloc.xloc, self.gridloc.yloc - 1))
+        if (len(fmap) > self.gridloc.xloc + 1 >= 0) and (0 <= self.gridloc.yloc < len(fmap)):
+            c.append(self.getlandunit(self.gridloc.xloc + 1, self.gridloc.yloc, fmap))
+        if (len(fmap) > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc + 1 < len(fmap)):
+            c.append(self.getlandunit(self.gridloc.xloc, self.gridloc.yloc + 1, fmap))
+        if (len(fmap) > self.gridloc.xloc - 1 >= 0) and (0 <= self.gridloc.yloc < len(fmap)):
+            c.append(self.getlandunit(self.gridloc.xloc - 1, self.gridloc.yloc, fmap))
+        if (len(fmap) > self.gridloc.xloc >= 0) and (0 <= self.gridloc.yloc - 1 < len(fmap)):
+            c.append(self.getlandunit(self.gridloc.xloc, self.gridloc.yloc - 1, fmap))
         return c
 
     def addserf(self):
-        self.serfs += 1
+        if self.serfs <= self.serfMax:
+            self.serfs += 1
+        else:
+            self.full = True

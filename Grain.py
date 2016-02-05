@@ -9,7 +9,7 @@ class Grain:
         self.wealth += w
 
     def subtractwealth(self, s):
-        self.wealth -= s
+        self.wealth = self.wealth - s
 
     def getwealth(self):
         return self.wealth
