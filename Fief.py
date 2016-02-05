@@ -14,19 +14,27 @@ class Fief:
         self.attackoptions = []
 
     def changewarstatus(self):
-        # Changes at War status
+        """
+        Changes at War status
+        """
         self.atWar = -self.atWar
 
     def changepreparedness(self):
-        # Changes a fief preparedness
+        """
+        Changes a fief preparedness
+        """
         self.preparedForWar = -self.preparedForWar
 
     def addland(self, LandUnit):
-        # adds land to the end of the contained land list
+        """
+         adds land to the end of the contained land list
+        """
         self.containedLand.append(LandUnit)
 
     def removeland(self, x, y):
-        # removes land from fiefs list
+        """
+        removes land from fiefs list
+        """
         i = 0
         t = False
         while i < len(self.containedLand):
@@ -37,7 +45,9 @@ class Fief:
                 break
 
     def findborders(self, fmap):
-        # Looks through landunits and finds the ones that border other fiefdoms it then adds
+        """
+        Looks through landunits and finds the ones that border other fiefdoms it then adds
+        """
         g.toconsole("Finding Borders")
         i = 0
         while i < len(self.containedLand):
@@ -62,6 +72,9 @@ class Fief:
         return self.attackoptions
 
     def removeattackoption(self, x, y):
+        """
+        Removes attack option from the list after it has been used
+        """
         i = 0
         t = False
         while i < len(self.attackoptions):
@@ -72,13 +85,19 @@ class Fief:
                 break
 
     def findupkeep(self):
+        """
+        Finds the upkeep for all the serfs on a fief
+        """
         i = 0
         cost = 0
         while i < len(self.containedLand):
-            cost += self.containedLand[i].getupkeep
+            cost += self.containedLand[i].getupkeep()
         return cost
 
     def placeserf(self):
+        """
+        Places serf on a random land unit in the fief
+        """
         x = 0
         while x == 0:
             g.toconsole("Placing serf")
@@ -94,10 +113,16 @@ class Fief:
                 g.topopup("Land unit " + str(r) + " is full")
 
     def calculatewealth(self):
+        """
+        Calculates wealth on entire fief
+        """
         i = 0
+        final = 0
         while i < len(self.containedLand):
             temp = self.containedLand[i].getproduction()
             temp = (temp - self.containedLand[i].getupkeep())
-            self.stores.wealth += temp
+            final += temp
             i += 1
+        final = final - self.ruler.combatants.calculateupkeep()
+        self.stores.wealth += final
         g.toconsole(str(self.ruler.name) + " has " + str(self.stores.wealth) + " grain at his disposal")
