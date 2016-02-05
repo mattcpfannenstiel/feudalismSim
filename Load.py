@@ -24,8 +24,8 @@ class Load():
         runs = g.getuserinputint("Enter the number of iterations", "5000")
         lords = g.getuserinputint("Enter the number of lords that can be square rooted(Max 100)", "4")
         landcount = g.getuserinputint("Enter the number of landunits per lord that can be square rooted(Max 100)", "4")
-        height = landcount
-        width = landcount
+        height = math.sqrt(landcount) * math.sqrt(lords)
+        width = math.sqrt(landcount) * math.sqrt(lords)
 
         # switches to a rule that has at least 5 states to use in Golly
         g.setrule("LifeHistory")
@@ -48,7 +48,7 @@ class Load():
         # Goes through each land unit to give it an initial state and initializes the board
         # Lords are also created with their given fiefs
         fmap = []
-        fiefnum = 1
+        fiefnum = 0
         startpointx = 0
         startpointy = 0
         lordslist = []
@@ -71,8 +71,8 @@ class Load():
 
         # Sets landunits into fiefs and fiefs into lords ownership
         x = 0
-        while fiefnum <= lords:
-            if fiefnum == 1:
+        while fiefnum < lords:
+            if fiefnum == 0:
                 g.toconsole("Starting fief construction")
             elif fiefnum >= sidelength:
                 if fiefnum % (sidelength + 1) == 0:
@@ -84,6 +84,7 @@ class Load():
                     x = startpointx
             else:
                 startpointx += sidelength
+                x = startpointx
             fief = Fief(fiefnum)
             while x < startpointx + sidelength:
                 y = 0 + startpointy
