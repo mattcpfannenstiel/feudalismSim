@@ -2,6 +2,9 @@ import golly as g
 
 
 class Gollyhandler:
+    """
+    Handles all the Golly calls so that it wont have to be imported into the files that need it
+    """
 
     def __init__(self):
         self.name = "FeudalSim"
@@ -12,7 +15,7 @@ class Gollyhandler:
     def toconsole(self, text):
         g.show(text)
 
-    def statechange(self, x, y, state):
+    def cellchange(self, x, y, state):
         g.setcell(x, y, state)
 
     def setstatecolors(self, state, r, gr, b):

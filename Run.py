@@ -17,7 +17,9 @@ class Run:
                 break
 
     def cycle(self):
-        # Goes through the yearly cycle for each lord
+        """
+        Goes through the yearly cycle for each lord
+        """
         g.topopup("Cycle")
         i = 0
         while i < self.board[2]:

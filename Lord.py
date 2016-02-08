@@ -25,22 +25,37 @@ class Lord:
                        " ", False)
 
     def addserf(self):
-        # Adds a serf to the number of serfs the Lord has
+        """
+        Adds a serf to the number of serfs the Lord has
+        """
         self.serfCount += 1
         if self.serfCount < 0:
             self.log.track("serfcount less than zero", " ", False)
 
     def getname(self):
+        """
+        Returns the name
+        """
         return self.name
 
     def getserfs(self):
+        """
+        Gets the number of serfs on the Fief
+        """
         return self.serfCount
 
     def prepared(self):
+        """
+        Returns the boolean ready
+        """
         return self.ready
 
     def decision(self):
-        # 33% Chance to attack, buy, or place a serf
+        """
+        33% Chance to attack, buy, or wait
+        Governs the decision mechanism of the Lords (Decision Rule)
+        Lords attack the most productive landunit nearby
+        """
         g.topopup("In decision")
         j = r.randint(0, 98)
         if j < 33:
@@ -55,18 +70,22 @@ class Lord:
             g.topopup("In combat phase")
             if self.combatants.getknightcount > 0:
                 target = self.lookforwealthyland()
-                g.statechange(target.gridloc.xloc, target.gridloc.yloc, 5)
+                g.cellchange(target.gridloc.xloc, target.gridloc.yloc, 5)
                 g.update()
                 g.topopup(str(self.name) + " is attacking " + str(target.owner.ruler.name)
                           + " over land unit at " + str(target.gridloc.xloc) + ", " + str(target.gridloc.yloc))
                 self.attack(target)
-                g.statechange(target.gridloc.xloc, target.gridloc.yloc, 2)
+                g.cellchange(target.gridloc.xloc, target.gridloc.yloc, 2)
                 g.update()
         else:
             g.topopup("Waiting")
 
     def attack(self, landUnit):
-        # Sends troops into combat, determines the winner and either takes land or defends it
+        """
+        Sends troops into combat, determines the winner and either takes land or defends it
+        Rule that governs the battles and decides combat by numbers but if they have the same number of knights
+        the battle is decided by a coin flip
+        """
         lose = 0
         win = 1
         if self.combatants.getknightcount() > landUnit.owner.ruler.combatants.getknightcount():
@@ -91,7 +110,9 @@ class Lord:
             return lose
 
     def buyknight(self):
-        # Buys a knight and adds him to the army that the lord has at his disposal
+        """
+        Buys a knight and adds him to the army that the lord has at his disposal
+        """
         if self.land.stores.getwealth() < 0:
             self.log.track("stores are less than zero", self.land.stores.getwealth(), True)
         else:
@@ -99,6 +120,9 @@ class Lord:
             self.combatants.addknight()
 
     def lookforwealthyland(self):
+        """
+        Looks for the most productive landunit from the fief's borders and returns it
+        """
         i = 0
         temp = 0
         target = self.land.attackoptions[0]

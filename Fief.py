@@ -15,25 +15,25 @@ class Fief:
 
     def changewarstatus(self):
         """
-        Changes at War status
+        Changes at War status to at war or not at war
         """
         self.atWar = -self.atWar
 
     def changepreparedness(self):
         """
-        Changes a fief preparedness
+        Changes a fief preparedness to be either prepared for war or unprepared for war
         """
         self.preparedForWar = -self.preparedForWar
 
     def addland(self, LandUnit):
         """
-         adds land to the end of the contained land list
+        Adds land to the end of the contained land list
         """
         self.containedLand.append(LandUnit)
 
     def removeland(self, x, y):
         """
-        removes land from fiefs list
+        Removes land from fiefs list
         """
         i = 0
         t = False
@@ -46,7 +46,7 @@ class Fief:
 
     def findborders(self, fmap):
         """
-        Looks through landunits and finds the ones that border other fiefdoms it then adds
+        Looks through landunits and finds the ones that border other fiefdoms it then adds it to the bordering units list
         """
         g.toconsole("Finding Borders")
         i = 0
@@ -86,7 +86,7 @@ class Fief:
 
     def findupkeep(self):
         """
-        Finds the upkeep for all the serfs on a fief
+        Finds the upkeep for all the serfs on a fief (serfs multiplied by upkeep cost)
         """
         i = 0
         cost = 0
@@ -96,7 +96,7 @@ class Fief:
 
     def placeserf(self):
         """
-        Places serf on a random land unit in the fief
+        Places serf on a random land unit in the fief that isn't full (10 serfs is full)
         """
         x = 0
         while x == 0:
@@ -104,7 +104,7 @@ class Fief:
             r = random.randint(0, (len(self.containedLand) - 1))
             if self.containedLand[r].full == False:
                 self.containedLand[r].addserf()
-                g.statechange(self.containedLand[r].gridloc.xloc, self.containedLand[r].gridloc.yloc, 2)
+                g.cellchange(self.containedLand[r].gridloc.xloc, self.containedLand[r].gridloc.yloc, 2)
                 g.toconsole("Serf placed in " + str(self.containedLand[r].gridloc.xloc) +
                             ", " + str(self.containedLand[r].gridloc.yloc) + " by " + self.ruler.name)
                 g.update()
@@ -115,6 +115,7 @@ class Fief:
     def calculatewealth(self):
         """
         Calculates wealth on entire fief
+        Rule that governs wealth calculation based on land unit production
         """
         i = 0
         final = 0
