@@ -1,5 +1,13 @@
 class Location:
+    """
+    Keeps the location of objects on the map
+    """
     def __init__(self, x, y):
+        """
+        Makes a new location instance
+        :param x: x location
+        :param y: y location
+        """
         self.xloc = x
         self.yloc = y
 

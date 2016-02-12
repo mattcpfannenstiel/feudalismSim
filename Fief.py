@@ -1,67 +1,84 @@
 import random
 from Gollyhandler import Gollyhandler
+from Logger import Logger
 
 g = Gollyhandler()
 
 
 class Fief:
+    """
+    This class is for land management and wealth tracking for a lord
+    """
+    log = Logger("Fief", "High")
+
     def __init__(self, fiefnum):
+        """
+        Makes a new fief
+        :param fiefnum: the number of the fief that should match the lord number
+        :return:
+        """
         self.fiefnumber = fiefnum
         self.atWar = False
         self.preparedForWar = False
         self.containedLand = []
         self.borders = []
         self.attackoptions = []
+        self.ruler = None
+        self.stores = None
 
     def changewarstatus(self):
         """
         Changes at War status to at war or not at war
         """
-        self.atWar = -self.atWar
+        self.atWar = not self.atWar
 
     def changepreparedness(self):
         """
         Changes a fief preparedness to be either prepared for war or unprepared for war
         """
-        self.preparedForWar = -self.preparedForWar
+        self.preparedForWar = not self.preparedForWar
 
     def addland(self, LandUnit):
         """
         Adds land to the end of the contained land list
+        :param LandUnit: the landunit to be added
         """
         self.containedLand.append(LandUnit)
 
     def removeland(self, x, y):
         """
         Removes land from fiefs list
+        :param x: the x location of the target landunit
+        :param y: the y location of the target landunit
         """
         i = 0
-        t = False
-        while i < len(self.containedLand):
-            if self.containedLand[i].gridloc.xloc == x and self.containedLand[i].gridloc.yloc == y:
-                self.containedLand.pop(i)
-            i += 1
-            if t:
-                break
+        t = True
+        while t:
+            while i < len(self.containedLand):
+                if self.containedLand[i].gridloc.xloc == x and self.containedLand[i].gridloc.yloc == y:
+                    self.containedLand.pop(i)
+                    t = False
+                i += 1
+
 
     def findborders(self, fmap):
         """
         Looks through landunits and finds the ones that border other fiefdoms it then adds it to the bordering units list
         """
-        g.toconsole("Finding Borders")
+        self.log.tracktext("Finding Borders")
         i = 0
         while i < len(self.containedLand):
             c = self.containedLand[i].getvonneumann(fmap)
-            g.toconsole("Found Von Neumann Neighborhood. Length is " + str(len(c)))
+            self.log.tracktext("Found Von Neumann Neighborhood. Length is " + str(len(c)))
             j = 0
             while j < len(c):
                 if c[j].owner.fiefnumber != self.fiefnumber:
-                    g.toconsole("Found non member")
+                    self.log.tracktext("Found non member")
                     if -self.borders.__contains__(self.containedLand[i]):
                         self.borders.append(self.containedLand[i])
-                        g.toconsole("Added to borders")
+                        self.log.tracktext("Added to borders")
                     self.attackoptions.append(c[j])
-                    g.toconsole("Added to attack options")
+                    self.log.tracktext("Added to attack options")
                 j += 1
             i += 1
 
@@ -74,12 +91,14 @@ class Fief:
     def removeattackoption(self, x, y):
         """
         Removes attack option from the list after it has been used
+        :param x: the x location of the target landunit
+        :param y: the y location of the target landunit
         """
         i = 0
         t = False
         while i < len(self.attackoptions):
             if self.attackoptions[i].gridloc.xloc == x and self.attackoptions[i].gridloc.yloc == y:
-                self.attackoptions.remove(i)
+                self.attackoptions.pop(i)
             i += 1
             if t:
                 break
@@ -100,17 +119,19 @@ class Fief:
         """
         x = 0
         while x == 0:
-            g.toconsole("Placing serf")
+            self.log.tracktext("Placing serf")
             r = random.randint(0, (len(self.containedLand) - 1))
             if self.containedLand[r].full == False:
                 self.containedLand[r].addserf()
                 g.cellchange(self.containedLand[r].gridloc.xloc, self.containedLand[r].gridloc.yloc, 2)
-                g.toconsole("Serf placed in " + str(self.containedLand[r].gridloc.xloc) +
-                            ", " + str(self.containedLand[r].gridloc.yloc) + " by " + self.ruler.name)
+                self.log.tracktext("Serf placed in " + str(self.containedLand[r].gridloc.xloc) +
+                                   ", " + str(self.containedLand[r].gridloc.yloc) + " by " + self.ruler.name)
                 g.update()
                 x = 1
+            if self.alllandfull():
+                x = 1
             else:
-                g.topopup("Land unit " + str(r) + " is full")
+                self.log.tracktext("Land unit " + str(r) + " is full")
 
     def calculatewealth(self):
         """
@@ -126,4 +147,24 @@ class Fief:
             i += 1
         final = final - self.ruler.combatants.calculateupkeep()
         self.stores.wealth += final
-        g.toconsole(str(self.ruler.name) + " has " + str(self.stores.wealth) + " grain at his disposal")
+        self.log.tracktext(str(self.ruler.name) + " has " + str(self.stores.wealth) + " grain at his disposal")
+
+    def alllandfull(self):
+        """
+        Checks to see if all land in a fief is full of serfs
+        :return: true for all landunits full and false for room to be utilized
+        """
+        self.log.tracktext("Got into all land full?")
+        self.log.tracktext("Contained land has " + str(len(self.containedLand)) + " land units in it")
+        if len(self.containedLand) != 0:
+            i = 0
+            while i < len(self.containedLand):
+                if not self.containedLand[i].full:
+                    self.log.tracktext("All good")
+                    return False
+                else:
+                    self.log.tracktext("Shouldn't show again")
+                    return True
+        else:
+            self.log.tracktext("No land")
+            return True
