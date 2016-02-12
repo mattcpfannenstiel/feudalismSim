@@ -33,12 +33,8 @@ class Test_Lord(unittest.TestCase):
         self.test_target = LandUnit(i - 1, j + 1, None)
         self.gollyh.cellchange(i - 1, j + 1, 1)
 
-    def tearDown(self):
-        self.doCleanups()
-        self.gollyh = None
-        self.test_fief = None
-        self.test_lord = None
-        print("Cleanup done")
+    def tearDown(self):       
+        print("Clean up done")
 
     def suite(self):
         suite = unittest.TestSuite()
@@ -50,7 +46,7 @@ class Test_Lord(unittest.TestCase):
 
     def test_decision(self):
         self.test_lord.decision()
-        self.assertEqual(self.test_lord.land.attackoptions, None, "Attack options are not none")
+        self.assertnotEqual(self.test_lord.land.attackoptions, None, "Attack options are not none")
         self.assertIsInstance(self.test_lord.land.attackoptions, [], "Attack options is list")
         self.assertEqual(self.test_lord.land.stores, None, "Wealth is None")
         self.assertEqual(self.test_lord.combantants.getknightcount(), 0, "There are no knights in the army")
