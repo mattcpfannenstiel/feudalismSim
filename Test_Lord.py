@@ -42,11 +42,16 @@ class Test_Lord(unittest.TestCase):
         self.test_target = LandUnit(i - 1, j + 1, None)
         self.gollyh.cellchange(i - 1, j + 1, 1)
 
+<<<<<<< HEAD
     def tearDown(self):
         """
         Represents the cleanup of the instances have completed
         """
         print("Teardown done")
+=======
+    def tearDown(self):       
+        print("Clean up done")
+>>>>>>> origin/master
 
     def suite(self):
         """
@@ -65,7 +70,7 @@ class Test_Lord(unittest.TestCase):
         This is a battery of test to ensure the functionality of the decision method in Lord
         """
         self.test_lord.decision()
-        self.assertEqual(self.test_lord.land.attackoptions, None, "Attack options are not none")
+        self.assertnotEqual(self.test_lord.land.attackoptions, None, "Attack options are not none")
         self.assertIsInstance(self.test_lord.land.attackoptions, [], "Attack options is list")
         self.assertEqual(self.test_lord.land.stores, None, "Wealth is None")
         self.assertEqual(self.test_lord.combantants.getknightcount(), 0, "There are no knights in the army")
