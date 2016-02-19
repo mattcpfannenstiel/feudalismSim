@@ -9,6 +9,9 @@ class Run:
     log = Logger("Run", "Low")
 
     def __init__(self):
+        """
+        Makes a new instance of the run class
+        """
         self.new = Load("Feudalism Simulation")
         self.log.tracktext("Now Loading")
         self.board = self.new.initialize()
@@ -18,13 +21,11 @@ class Run:
             cont = self.cycle()
         self.log.tracktext("Simulation complete")
 
-
     def cycle(self):
         """
         Goes through the turn for each lord for every year
         :return: a zero when the number of runs is complete
         """
-
         i = 0
         while i < self.board[2]:
             self.log.trackconsoleonly("Yearly cycle", i)

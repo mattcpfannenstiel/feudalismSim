@@ -10,6 +10,9 @@ class Fief:
     This class is for land management and wealth tracking for a lord
     """
     log = Logger("Fief", "High")
+    protected_blue = [90]
+    protected_green = [216]
+    protected_red = [230]
 
     def __init__(self, fiefnum):
         """
@@ -25,6 +28,10 @@ class Fief:
         self.attackoptions = []
         self.ruler = None
         self.stores = None
+        self.red = None
+        self.green = None
+        self.blue = None
+        self.color = [self.red, self.green, self.blue]
 
     def changewarstatus(self):
         """
@@ -55,11 +62,10 @@ class Fief:
         t = True
         while t:
             while i < len(self.containedLand):
-                if self.containedLand[i].gridloc.xloc == x and self.containedLand[i].gridloc.yloc == y:
+                if self.containedLand[i].GRID_LOCATION.xloc == x and self.containedLand[i].GRID_LOCATION.yloc == y:
                     self.containedLand.pop(i)
                     t = False
                 i += 1
-
 
     def findborders(self, fmap):
         """
@@ -97,7 +103,7 @@ class Fief:
         i = 0
         t = False
         while i < len(self.attackoptions):
-            if self.attackoptions[i].gridloc.xloc == x and self.attackoptions[i].gridloc.yloc == y:
+            if self.attackoptions[i].GRID_LOCATION.xloc == x and self.attackoptions[i].GRID_LOCATION.yloc == y:
                 self.attackoptions.pop(i)
             i += 1
             if t:
@@ -123,9 +129,9 @@ class Fief:
             r = random.randint(0, (len(self.containedLand) - 1))
             if self.containedLand[r].full == False:
                 self.containedLand[r].addserf()
-                g.cellchange(self.containedLand[r].gridloc.xloc, self.containedLand[r].gridloc.yloc, 2)
-                self.log.tracktext("Serf placed in " + str(self.containedLand[r].gridloc.xloc) +
-                                   ", " + str(self.containedLand[r].gridloc.yloc) + " by " + self.ruler.name)
+                g.cellchange(self.containedLand[r].GRID_LOCATION.xloc, self.containedLand[r].GRID_LOCATION.yloc, 2)
+                self.log.tracktext("Serf placed in " + str(self.containedLand[r].GRID_LOCATION.xloc) +
+                                   ", " + str(self.containedLand[r].GRID_LOCATION.yloc) + " by " + self.ruler.name)
                 g.update()
                 x = 1
             if self.alllandfull():

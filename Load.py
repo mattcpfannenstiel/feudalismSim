@@ -1,4 +1,6 @@
 import math
+import random as r
+
 from Gollyhandler import Gollyhandler
 from Fief import Fief
 from Grain import Grain
@@ -7,8 +9,7 @@ from Lord import Lord
 from Logger import Logger
 
 
-
-class Load():
+class Load:
     """
     Creates the map grid and sets up the lords for the simulation
     """
@@ -26,7 +27,8 @@ class Load():
         # Parameters of the simulation for testing purposes
         self.runs = self.g.getuserinputint("Enter the number of iterations", "5000")
         self.lords = self.g.getuserinputint("Enter the number of lords that can be square rooted(Max 100)", "4")
-        self.landcount = self.g.getuserinputint("Enter the number of landunits per lord that can be square rooted(Max 100)", "4")
+        self.landcount = self.g.getuserinputint("Enter the number of landunits per lord that can be square rooted"
+                                                "(Max 100)", "4")
         self.height = math.sqrt(self.landcount) * math.sqrt(self.lords)
         self.width = math.sqrt(self.landcount) * math.sqrt(self.lords)
 
@@ -34,26 +36,22 @@ class Load():
         self.g.setrule("LifeHistory")
 
         # Sets Golly to the position view of the x and y coordinates in the center
-        self.g.setpos(x, y)
+        # self.g.setpos(str(self.width / 2), str(self.height / 2))
 
         # State 5 is fought over land and is red
         self.g.setstatecolors(5, 255, 0, 0)
 
-
         # State 4 is occupied and battle scarred land and is blue
         self.g.setstatecolors(4, 0, 0, 255)
 
-
         # State 3 is occupied and underproducing land and is yellow
         self.g.setstatecolors(3, 230, 216, 90)
-
 
         # State 2 is occupied and normal production land and is green
         self.g.setstatecolors(2, 0, 255, 0)
 
         # State 1 is farmable land and is white
         self.g.setstatecolors(1, 255, 255, 255)
-
 
     def initialize(self):
         """
@@ -62,8 +60,8 @@ class Load():
         and width and height of the map
         """
 
-        #Goes through each land unit to give it an initial state and initializes the board
-        #Lords are also created with their given fiefs
+        # Goes through each land unit to give it an initial state and initializes the board
+        # Lords are also created with their given fiefs
         fiefnum = 0
         startpointx = 0
         startpointy = 0
@@ -82,7 +80,8 @@ class Load():
         # Sets landunits into fiefs and fiefs into lords ownership
         x = 0
         while fiefnum < self.lords:
-            self.log.tracktext("Fiefnum is " + str(fiefnum) + "\nSidemod is " + str(sidemod) + "\nSidelength is " + str(sidelength))
+            self.log.tracktext(
+                "Fiefnum is " + str(fiefnum) + "\nSidemod is " + str(sidemod) + "\nSidelength is " + str(sidelength))
             if fiefnum == 0:
                 self.log.tracktext("Starting fief construction")
             elif fiefnum >= lordside:
@@ -97,10 +96,12 @@ class Load():
                 startpointx += sidelength
                 x = startpointx
             fief = Fief(fiefnum)
+            self.border_color_generate(fief)
             while x < startpointx + sidelength:
                 y = 0 + startpointy
                 while y < startpointy + sidelength:
                     self.populatemap(fief, fmap, x, y, fiefnum)
+                    self.make_borders(fief, x, y, 1, 1)
                     y += 1
                 x += 1
             grain = Grain(fief)
@@ -172,3 +173,97 @@ class Load():
         fmap[x][y].append(land)
         fmap[x][y].append(1)
         self.g.cellchange(x, y, 1)
+
+    def border_color_generate(self, fief):
+        """
+        Creates a Color with an rgb value unlike others on the map. Only one randomly generated color may match another
+        color already generated
+        :param fief: This is the fief that is having color added to it
+        :return:
+        """
+        c = 0
+        done = False
+        while not done:
+            blue = r.randint(1, 254)
+            red = r.randint(1, 254)
+            green = r.randint(1, 254)
+            self.log.tracktext("Starting Blue")
+            if self.protected_color_check(fief, blue, fief.protected_blue):
+                self.log.tracktext("Blue is in")
+                c += 1
+            self.log.tracktext("Starting Green")
+            if self.protected_color_check(fief, green, fief.protected_green):
+                self.log.tracktext("Green is go")
+                c += 1
+            self.log.tracktext("Starting Red")
+            if self.protected_color_check(fief, red, fief.protected_red):
+                self.log.tracktext("Red is out")
+                c += 1
+            if c > 1:
+                self.log.tracktext("Got to end condition")
+                fief.red = red
+                fief.blue = blue
+                fief.green = green
+                self.add_to_protected_colors(fief, red, green, blue)
+                done = True
+            self.log.tracknum("C is:", c)
+            if c <= 1:
+                self.log.tracktext("Got to reset")
+                c = 0
+
+    @staticmethod
+    def protected_color_check(fief, color, protected_color_list):
+        """
+        Checks the Protected color list to make sure the generated color doesn't match any on the list
+        :param fief: the fief whose color is being addressed
+        :param color: the number value of the color
+        :param protected_color_list: the list of already generated color
+        :return: true for it isn't a protected color and false for the color being on the list
+        """
+        i = 0
+        f = 0
+        fief.log.tracknum("Protected list length is:", len(protected_color_list))
+        while i < len(protected_color_list):
+            fief.log.tracknum("In protected color check", i)
+            m = len(protected_color_list)
+            fief.log.tracknum("Color is:", color)
+            fief.log.tracknum("Protected color is:", protected_color_list[i])
+            if color != protected_color_list[i]:
+                f += 1
+            if m == f:
+                return True
+            i += 1
+        fief.log.tracktext("Failed the protected color check")
+        return False
+
+    @staticmethod
+    def add_to_protected_colors(fief, red, green, blue):
+        """
+        After an acceptable color set is found it is added to the lists of protected colors
+        :param fief: fief being addressed
+        :param red: red color value
+        :param green: green color value
+        :param blue: blue color value
+        """
+        fief.blue = blue
+        fief.protected_blue.append(blue)
+        fief.green = green
+        fief.protected_green.append(green)
+        fief.red = red
+        fief.protected_red.append(red)
+
+    def make_borders(self, fief, startx, starty, width, height):
+        """
+        This routine is to set up the border color for each fief
+        :param fief: The fief being generated for
+        :param startx: the x position of the land unit in question
+        :param starty: the y position of the land unit in quesiton
+        :param width: the width of the grid in question
+        :param height: the height of the grid in question
+        """
+        self.log.tracktext("In make borders")
+        self.g.select_rectangle_for_borders(startx, starty, width, height)
+        self.log.tracktext("Going into set border color")
+        self.g.set_border_color(fief)
+        self.log.tracktext("Got through border color")
+        self.g.update()

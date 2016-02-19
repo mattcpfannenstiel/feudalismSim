@@ -1,5 +1,12 @@
 class Grain:
+    """
+    This class tracks the grain stores, surplus status and wealth of a fief
+    """
     def __init__(self, fief):
+        """
+        This creates a new instance of the grain class
+        :param fief: represents the fief that owns the grain
+        """
         self.surplus = False
         self.wealth = 0
         self.upkeep = 0

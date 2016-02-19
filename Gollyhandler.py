@@ -1,6 +1,7 @@
 import golly as g
 
 
+
 class Gollyhandler:
     """
     Handles all the Golly calls so that it wont have to be imported into the files that need it
@@ -18,6 +19,23 @@ class Gollyhandler:
         :param text: text to be output
         """
         g.note(text)
+
+    def select_rectangle_for_borders(self, startx, starty, width, height):
+        """
+        Selects the grid to have a border set around it
+        :param startx: Starting x position of the grid
+        :param starty: Starting y position of the grid
+        :param width: Width of the grid
+        :param height: Height of the grid
+        """
+        g.select([startx, starty, width, height])
+
+    def set_border_color(self, fief):
+        """
+        Sets the selected grid to the color assisgned to the fief
+        :param fief: The fief that has already been assigned a color
+        """
+        g.setcolor("border", fief.red, fief.green, fief.blue)
 
     def toconsole(self, text):
         """

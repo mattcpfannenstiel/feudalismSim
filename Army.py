@@ -1,8 +1,16 @@
 class Army:
+    """
+    This tracks the combat strength and upkeep cost of each combat unit
+    """
     def __init__(self):
+        """
+        Creates a new army for a lord
+        """
         self.knightcount = 0
-        self.uCost = 10
-        self.bCost = 100
+        # Upkeep cost
+        self.UCOST = 10
+        # Buy cost
+        self.BCOST = 100
 
 
     def getknightcount(self):
@@ -23,7 +31,7 @@ class Army:
         """
         Returns the buy costs of Knights
         """
-        return self.bCost
+        return self.BCOST
 
 
     def addknight(self):
@@ -44,5 +52,5 @@ class Army:
         """
         Returns the upkeep cost of the army
         """
-        return self.uCost * self.knightcount
+        return self.UCOST * self.knightcount
 

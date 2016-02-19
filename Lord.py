@@ -8,7 +8,8 @@ g = Gollyhandler()
 
 class Lord:
     """
-    Lords are the main players in the simulation and make all the decisions
+    Lords are the main players in the simulation and make all the decisions such as attacking, buying knights, waiting
+    or placing a serf.
     """
     log = Logger("Lord", "High")
     turn = 0
@@ -61,7 +62,7 @@ class Lord:
         """
         33% Chance to attack, buy, or wait
         Governs the decision mechanism of the Lords (Decision Rule)
-        Lords attack the most productive landunit nearby
+        Lords attack the most productive land unit nearby
         """
         self.log.tracktext("In decision")
         j = r.randint(0, 98)
@@ -78,13 +79,13 @@ class Lord:
             if self.combatants.getknightcount > 0:
                 target = self.lookforwealthyland()
                 if target is not None:
-                    g.cellchange(target.gridloc.xloc, target.gridloc.yloc, 5)
+                    g.cellchange(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc, 5)
                     g.update()
                     self.log.tracktext(str(self.name) + " is attacking " + str(target.owner.ruler.name)
-                          + " over land unit at " + str(target.gridloc.xloc) + ", " + str(target.gridloc.yloc))
-                    self.land.removeattackoption(target.gridloc.xloc, target.gridloc.yloc)
+                          + " over land unit at " + str(target.GRID_LOCATION.xloc) + ", " + str(target.GRID_LOCATION.yloc))
+                    self.land.removeattackoption(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc)
                     self.attack(target)
-                    g.cellchange(target.gridloc.xloc, target.gridloc.yloc, 2)
+                    g.cellchange(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc, 2)
                     g.update()
                 else:
                     self.log.tracktext("No target available")
@@ -102,14 +103,14 @@ class Lord:
         if self.combatants.getknightcount() > landUnit.owner.ruler.combatants.getknightcount():
             landUnit.changeowner(self.land)
             self.land.containedLand.append(landUnit)
-            landUnit.owner.removeland(landUnit.gridloc.xloc, landUnit.gridloc.yloc)
+            landUnit.owner.removeland(landUnit.GRID_LOCATION.xloc, landUnit.GRID_LOCATION.yloc)
             self.log.tracktext(str(self.name) + " wins the battle")
         if self.combatants.getknightcount() == landUnit.owner.ruler.combatants.getknightcount():
             i = r.randint(0, 99)
             if i > 49:
                 landUnit.changeowner(self.land)
                 self.land.containedLand.append(landUnit)
-                landUnit.owner.removeland(landUnit.gridloc.xloc, landUnit.gridloc.yloc)
+                landUnit.owner.removeland(landUnit.GRID_LOCATION.xloc, landUnit.GRID_LOCATION.yloc)
                 self.log.tracktext(str(self.name) + " wins the battle")
             else:
                 self.log.tracktext(str(landUnit.owner.ruler.name) + " wins the battle")
@@ -129,7 +130,7 @@ class Lord:
 
     def lookforwealthyland(self):
         """
-        Looks for the most productive landunit from the fief's borders and returns it
+        Looks for the most productive land unit from the fief's attack options and returns it
         """
         i = 0
         temp = 0
@@ -141,7 +142,8 @@ class Lord:
                     temp = self.land.attackoptions[i].getproduction()
                     target = self.land.attackoptions[i]
                 i += 1
-            self.log.tracktext("Target is " + str(target.owner.ruler.name) +" at "+ str(target.gridloc.xloc) + ", " + str(target.gridloc.yloc))
+            self.log.tracktext("Target is " + str(target.owner.ruler.name) +" at "+ str(target.GRID_LOCATION.xloc) +
+                               ", " + str(target.GRID_LOCATION.yloc))
             return target
         else:
             return None

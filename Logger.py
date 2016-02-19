@@ -1,10 +1,11 @@
 import logging
+
 from Gollyhandler import Gollyhandler
 
 
 class Logger:
     """
-    Tracks messages for the console, popup windows and the log
+    This class tracks messages for the console, popup windows and the log
     """
     logging.basicConfig(filename='debug.log', level=logging.DEBUG)
     g = Gollyhandler()
@@ -14,17 +15,16 @@ class Logger:
 
     def __init__(self, name, level):
         """
-        Makes a new Logger
+        Makes a new Logger for a given class at a priority level
         :param name: name of the class being logged
         :param level: level of log to be output to
         """
         self.Name = name
         self.level = "low"
 
-
     def tracknum(self, text, number):
         """
-        Logs text with a number for output
+        Logs text with a number for output in Golly or in the Log
         :param text: text to be put in the message
         :param number: number to be put in the message
         """
@@ -38,7 +38,7 @@ class Logger:
 
     def tracktext(self, text):
         """
-        Logs text only for output
+        Logs text only for output in Golly or the Log
         :param text: text to be output
         """
         # For log tracking, popping up, or printing out messages
