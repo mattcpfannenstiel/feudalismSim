@@ -1,8 +1,8 @@
 import random
-from Gollyhandler import Gollyhandler
 from Logger import Logger
 
-g = Gollyhandler()
+
+
 
 
 class Fief:

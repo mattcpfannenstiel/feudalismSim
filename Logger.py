@@ -1,6 +1,7 @@
 import logging
-
-from Gollyhandler import Gollyhandler
+view = False
+if view:
+    from Gollyhandler import Gollyhandler
 
 
 class Logger:
@@ -8,11 +9,12 @@ class Logger:
     This class tracks messages for the console, popup windows and the log
     """
     logging.basicConfig(filename='debug.log', level=logging.DEBUG)
-    g = Gollyhandler()
+
     POPUP = False
     LOG = False
-    CONSOLE = True
-
+    CONSOLE = False
+    if LOG | CONSOLE:
+        g = Gollyhandler()
     def __init__(self, name, level):
         """
         Makes a new Logger for a given class at a priority level
