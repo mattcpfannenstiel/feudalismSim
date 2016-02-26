@@ -1,11 +1,9 @@
 import random as r
 from Army import Army
 from Logger import Logger
-view = False
+from Gollyhandler import Gollyhandler
 
-if(view == True):
-    from Gollyhandler import Gollyhandler
-    g = Gollyhandler()
+g = Gollyhandler()
 
 
 class Lord:
@@ -31,7 +29,8 @@ class Lord:
                        "\nLord's name: " + self.name +
                        "\nNumber of serfs on Fief: " + str(self.serfCount) +
                        "\nNumber of Knights: " + str(self.combatants.getknightcount()) +
-                       "\nReady for War status: " + str(self.ready))
+                       "\nReady for War status: " + str(self.ready) +
+                       "\nNumber of Fief: " + str(self.land.fiefnumber))
 
     def addserf(self):
         """
@@ -80,16 +79,14 @@ class Lord:
             if self.combatants.getknightcount > 0:
                 target = self.lookforwealthyland()
                 if target is not None:
-                    if view:
-                        g.cellchange(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc, 5)
-                        g.update()
+                    g.cellchange(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc, 5)
+                    g.update()
                     self.log.tracktext(str(self.name) + " is attacking " + str(target.owner.ruler.name)
                           + " over land unit at " + str(target.GRID_LOCATION.xloc) + ", " + str(target.GRID_LOCATION.yloc))
                     self.land.removeattackoption(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc)
                     self.attack(target)
-                    if view:
-                        g.cellchange(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc, 2)
-                        g.update()
+                    g.cellchange(target.GRID_LOCATION.xloc, target.GRID_LOCATION.yloc, 2)
+                    g.update()
                 else:
                     self.log.tracktext("No target available")
         else:

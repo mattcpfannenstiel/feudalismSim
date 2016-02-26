@@ -1,8 +1,7 @@
 import math
 import random as r
-view = False
-if view:
-    from Gollyhandler import Gollyhandler
+
+from Gollyhandler import Gollyhandler
 from Fief import Fief
 from Grain import Grain
 from LandUnit import LandUnit
@@ -15,8 +14,7 @@ class Load:
     Creates the map grid and sets up the lords for the simulation
     """
     log = Logger("Load", "Low")
-    if view:
-        g = Gollyhandler()
+    g = Gollyhandler()
 
     def __init__(self, Name):
         """
@@ -24,43 +22,36 @@ class Load:
         :param Name: Name of the simulation
         """
         self.name = Name
-        if view:
-            self.g.setsimname(self.name)
+        self.g.setsimname(self.name)
 
         # Parameters of the simulation for testing purposes
-            self.runs = self.g.getuserinputint("Enter the number of iterations", "5000")
-            self.lords = self.g.getuserinputint("Enter the number of lords that can be square rooted(Max 100)", "4")
-            self.landcount = self.g.getuserinputint("Enter the number of landunits per lord that can be square rooted"
+        self.runs = self.g.getuserinputint("Enter the number of iterations", "5000")
+        self.lords = self.g.getuserinputint("Enter the number of lords that can be square rooted(Max 100)", "4")
+        self.landcount = self.g.getuserinputint("Enter the number of landunits per lord that can be square rooted"
                                                 "(Max 100)", "4")
-            self.height = math.sqrt(self.landcount) * math.sqrt(self.lords)
-            self.width = math.sqrt(self.landcount) * math.sqrt(self.lords)
+        self.height = math.sqrt(self.landcount) * math.sqrt(self.lords)
+        self.width = math.sqrt(self.landcount) * math.sqrt(self.lords)
 
         # Sets Golly into a rule set with 8 states to work with
-            self.g.setrule("LifeHistory")
+        self.g.setrule("LifeHistory")
 
         # Sets Golly to the position view of the x and y coordinates in the center
         # self.g.setpos(str(self.width / 2), str(self.height / 2))
 
         # State 5 is fought over land and is red
-            self.g.setstatecolors(5, 255, 0, 0)
+        self.g.setstatecolors(5, 255, 0, 0)
 
         # State 4 is occupied and battle scarred land and is blue
-            self.g.setstatecolors(4, 0, 0, 255)
+        self.g.setstatecolors(4, 0, 0, 255)
 
         # State 3 is occupied and underproducing land and is yellow
-            self.g.setstatecolors(3, 230, 216, 90)
+        self.g.setstatecolors(3, 230, 216, 90)
 
         # State 2 is occupied and normal production land and is green
-            self.g.setstatecolors(2, 0, 255, 0)
+        self.g.setstatecolors(2, 0, 255, 0)
 
         # State 1 is farmable land and is white
-            self.g.setstatecolors(1, 255, 255, 255)
-        else:
-            self.width = 4
-            self.height = 4
-            self.runs = 5000
-            self.lords = 4
-            self.landcount = 4
+        self.g.setstatecolors(1, 255, 255, 255)
 
     def initialize(self):
         """
@@ -119,8 +110,7 @@ class Load:
             lord.land.ruler = lord
             lordslist.append(lord)
             fiefnum += 1
-            if view:
-                self.g.update()
+            self.g.update()
         boardstate = self.makeboardstate(fmap, lordslist, self.runs, self.width, self.height)
         self.log.tracktext("Board Creation done")
         return boardstate
@@ -182,8 +172,7 @@ class Load:
         fmap[x][y].append(y)
         fmap[x][y].append(land)
         fmap[x][y].append(1)
-        if view:
-            self.g.cellchange(x, y, 1)
+        self.g.cellchange(x, y, 1)
 
     def border_color_generate(self, fief):
         """
@@ -272,10 +261,9 @@ class Load:
         :param width: the width of the grid in question
         :param height: the height of the grid in question
         """
-        if view:
-            self.log.tracktext("In make borders")
-            self.g.select_rectangle_for_borders(startx, starty, width, height)
-            self.log.tracktext("Going into set border color")
-            self.g.set_border_color(fief)
-            self.log.tracktext("Got through border color")
-            self.g.update()
+        self.log.tracktext("In make borders")
+        self.g.select_rectangle_for_borders(startx, starty, width, height)
+        self.log.tracktext("Going into set border color")
+        self.g.set_border_color(fief)
+        self.log.tracktext("Got through border color")
+        self.g.update()
